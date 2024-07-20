@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function saveDepthChart() {
     const starters = [...document.getElementById('starters').children].map(li => li.textContent.split(' - ')[0]);
-    const backups = [...document.getElementById('backups').children].map(li => li.textContent.split(' - ')[0]);
+    const backups = [...document.getElementId('backups').children].map(li => li.textContent.split(' - ')[0]);
 
     gapi.client.sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
@@ -121,4 +121,33 @@ document.addEventListener('DOMContentLoaded', function() {
       spreadsheetId: SHEET_ID,
       range: 'Play Data!A2:E'
     }).then(function(response) {
-      const plays =
+      const plays = response.result.values;
+      const playStats = {};
+
+      plays.forEach(play => {
+        const [ , lineup, playName, yardage, playType] = play;
+        if (!playStats[playName]) {
+          playStats[playName] = { totalYardage: 0, count: 0, type: playType };
+        }
+        playStats[playName].totalYardage += parseInt(yardage);
+        playStats[playName].count += 1;
+      });
+
+      const sortedPlays = Object.entries(playStats).map(([playName, stats]) => ({
+        playName,
+        averageYardage: stats.totalYardage / stats.count,
+        type: stats.type
+      })).sort((a, b) => b.type === 'Offense' ? b.averageYardage - a.averageYardage : a.averageYardage - b.averageYardage);
+
+      bestPlaysList.innerHTML = sortedPlays.map(play => `<li>${play.playName} (${play.type}) - ${play.averageYardage.toFixed(2)} yards</li>`).join('');
+    });
+  }
+
+  minusButton.addEventListener('click', () => {
+    yardageInput.value = (parseInt(yardageInput.value) || 0) - 1;
+  });
+
+  plusButton.addEventListener('click', () => {
+    yardageInput.value = (parseInt(yardageInput.value) || 0) + 1;
+  });
+});
