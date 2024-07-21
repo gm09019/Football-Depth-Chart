@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }).then(function(response) {
       console.log('Sheets data loaded:', response);
       const players = response.result.valueRanges[0].values;
-      const plays = response.result.valueRanges[1].values;
+      const plays = response.result.valueRanges[1] ? response.result.valueRanges[1].values : [];
       console.log('Players:', players);
       console.log('Plays:', plays);
       renderDepthChart(players);
@@ -72,6 +72,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const bestPlaysList = document.getElementById('best-plays');
     const playStats = {};
 
+    if (!plays || plays.length === 0) {
+      bestPlaysList.innerHTML = `<li>No play data available</li>`;
+      return;
+    }
+
     plays.forEach(play => {
       const [ , lineup, playName, yardage, playType] = play;
       if (!playStats[playName]) {
@@ -104,4 +109,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
     gapi.client.sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
-      range
+      range: 'Play Data!A2',
+      valueInputOption: 'RAW',
+      resource: {
+        values: [[new Date(), lineup, play, yardage, playType]],
+        majorDimension: 'ROWS'
+      }
+    }).then(function(response) {
+      console.log('Play recorded:', response);
+      loadSheetsData(); // Refresh data after recording a play
+    }, function(error) {
+      console.error('Error recording play:', error);
+    });
+  });
+
+  document.getElementById('minus').addEventListener('click', () => {
+    const yardageInput = document.getElementById('yardage');
+    yardageInput.value = (parseInt(yardageInput.value) || 0) - 1;
+  });
+
+  document.getElementById('plus').addEventListener('click', () => {
+    const yardageInput = document.getElementById('yardage');
+    yardageInput.value = (parseInt(yardageInput.value) || 0) + 1;
+  });
+});
