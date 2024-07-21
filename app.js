@@ -44,20 +44,31 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Rendering depth chart');
     const startersList = document.getElementById('starters');
     const backupsList = document.getElementById('backups');
-    
+
     const positions = ['Center', 'Quarter Back', 'Full Back', 'Left Guard', 'Right Guard', 'Left Tackle', 'Right Tackle', 'Left Tight End', 'Right Tight End', 'Left Wing Back', 'Right Wing Back'];
 
-    const starters = positions.map(position => {
-      const player = players.find(player => player.includes(position));
-      console.log('Found starter for position', position, player);
-      return player;
+    const starters = [];
+    const backups = [];
+
+    positions.forEach(position => {
+      const player = players.find(p => p[1] === position);
+      if (player) {
+        starters.push(player);
+      } else {
+        starters.push([`No starter for ${position}`]);
+      }
     });
-    const backups = players.filter(player => !starters.includes(player));
+
+    players.forEach(player => {
+      if (!positions.includes(player[1])) {
+        backups.push(player);
+      }
+    });
 
     console.log('Starters:', starters);
     console.log('Backups:', backups);
 
-    startersList.innerHTML = starters.map(player => player ? `<li>${player[0]} - ${player[1]}</li>` : `<li>No starter for ${positions[starters.indexOf(player)]}</li>`).join('');
+    startersList.innerHTML = starters.map(player => player.length > 1 ? `<li>${player[0]} - ${player[1]}</li>` : `<li>${player[0]}</li>`).join('');
     backupsList.innerHTML = backups.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
   }
 });
