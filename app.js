@@ -107,12 +107,16 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Yardage:', yardage);
     console.log('Lineup:', lineup);
 
+    const playData = [new Date().toISOString(), lineup, play, yardage, playType];
+
+    console.log('Play Data to Append:', playData);
+
     gapi.client.sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
       range: 'Play Data!A2:E',
       valueInputOption: 'RAW',
       resource: {
-        values: [[new Date(), lineup, play, yardage, playType]],
+        values: [playData],
         majorDimension: 'ROWS'
       }
     }).then(function(response) {
