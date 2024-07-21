@@ -1,38 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Football Depth Chart</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Depth Chart</title>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="app.js" defer></script>
 </head>
 <body>
-  <h1>Football Depth Chart</h1>
-  <div id="depth-chart">
-    <h2>Starters</h2>
-    <ul id="starters"></ul>
-    <h2>Backups</h2>
-    <ul id="backups"></ul>
-  </div>
-  <div id="play-input">
-    <h2>Record Play</h2>
-    <select id="play-type">
-      <option value="Offense">Offense</option>
-      <option value="Defense">Defense</option>
-    </select>
-    <input type="text" id="play" placeholder="Play">
-    <div id="yardage-selector">
-      <button id="minus">-</button>
-      <input type="number" id="yardage" placeholder="Yardage Gained/Lost" min="-99" max="99">
-      <button id="plus">+</button>
+    <h1>Football Depth Chart</h1>
+    <div>
+        <h2>Starters</h2>
+        <ul id="starters"></ul>
     </div>
-    <button id="record-play">Record Play</button>
-  </div>
-  <div id="play-stats">
-    <h2>Best Plays</h2>
-    <ul id="best-plays"></ul>
-  </div>
-  <script src="https://apis.google.com/js/api.js"></script>
-  <script src="app.js"></script>
+    <div>
+        <h2>Backups</h2>
+        <ul id="backups"></ul>
+    </div>
+    <div>
+        <h2>Best Plays</h2>
+        <ul id="best-plays"></ul>
+    </div>
+    <div>
+        <h2>Record Play</h2>
+        <label for="play-type">Play Type:</label>
+        <input type="text" id="play-type">
+        <label for="play">Play:</label>
+        <input type="text" id="play">
+        <label for="yardage">Yardage:</label>
+        <input type="number" id="yardage" value="0">
+        <button id="minus">-1</button>
+        <button id="plus">+1</button>
+        <button id="record-play">Record Play</button>
+    </div>
 </body>
 </html>
