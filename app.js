@@ -6,15 +6,16 @@ document.addEventListener('DOMContentLoaded', function() {
   const minusButton = document.getElementById('minus');
   const plusButton = document.getElementById('plus');
 
-  const API_KEY = 'YOUR_API_KEY';
-  const SHEET_ID = 'YOUR_SHEET_ID';
+  const API_KEY = 'AIzaSyBQT0HSLG0Duc7iRvcDtv5PFAGXknTk-aY'; // Replace with your actual API key
+  const SHEET_ID = '1e0EMRqmzGXB9etrRNMW7luqSsxehVeliGaTR8i8ASFw';
+  const CLIENT_ID = 'football-depth-chart-service-a@lexical-period-406219.iam.gserviceaccount.com'; // Replace with your client email
 
   gapi.load('client:auth2', initClient);
 
   function initClient() {
     gapi.client.init({
       apiKey: API_KEY,
-      clientId: 'YOUR_CLIENT_ID',
+      clientId: CLIENT_ID,
       discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
       scope: "https://www.googleapis.com/auth/spreadsheets"
     }).then(function () {
@@ -86,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function saveDepthChart() {
     const starters = [...document.getElementById('starters').children].map(li => li.textContent.split(' - ')[0]);
-    const backups = [...document.getElementId('backups').children].map(li => li.textContent.split(' - ')[0]);
+    const backups = [...document.getElementById('backups').children].map(li => li.textContent.split(' - ')[0]);
 
     gapi.client.sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
