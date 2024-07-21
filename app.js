@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     gapi.client.sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
-      range: 'Play Data!A2',
+      range: 'Play Data!A2:E',
       valueInputOption: 'RAW',
       resource: {
         values: [[new Date(), lineup, play, yardage, playType]],
