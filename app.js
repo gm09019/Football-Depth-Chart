@@ -20,10 +20,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }).then(function () {
       console.log('GAPI client initialized');
       gapi.auth2.getAuthInstance().signIn().then(loadSheetsData).catch(function(error) {
-        console.error('Error during sign-in:', error);
+        console.error('Sign-in error:', error);
       });
     }).catch(function(error) {
-      console.error('Error initializing GAPI client:', error);
+      console.error('GAPI client initialization error:', error);
       console.log('Error details:', error.details);
     });
   }
