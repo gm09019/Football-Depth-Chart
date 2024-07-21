@@ -9,22 +9,22 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('SHEET_ID:', SHEET_ID);
   console.log('CLIENT_ID:', CLIENT_ID);
 
-  gapi.load('client:auth2', initClient);
+  window.handleCredentialResponse = (response) => {
+    console.log('Credential Response', response);
+    const user = jwt_decode(response.credential);
+    console.log('User:', user);
+    initClient();
+  };
 
   function initClient() {
     gapi.client.init({
       apiKey: API_KEY,
-      clientId: CLIENT_ID,
-      discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
-      scope: "https://www.googleapis.com/auth/spreadsheets"
+      discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
     }).then(function () {
       console.log('GAPI client initialized');
-      gapi.auth2.getAuthInstance().signIn().then(loadSheetsData).catch(function(error) {
-        console.error('Sign-in error:', error);
-      });
+      loadSheetsData();
     }).catch(function(error) {
       console.error('GAPI client initialization error:', error);
-      console.log('Error details:', error.details);
     });
   }
 
@@ -48,4 +48,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const startersList = document.getElementById('starters');
     const backupsList = document.getElementById('backups');
 
-    const positions = ['Center', 'Quarter Back', '
+    const positions = ['Center', 'Quarter Back', 'Full Back', 'Left Guard', 'Right Guard', 'Left Tackle', 'Right Tackle', 'Left Tight End', 'Right Tight End', 'Left Wing Back', 'Right Wing Back'];
+
+    const starters = [];
+    const backups = [...players];
+
+    positions.forEach(position => {
+      const playerIndex = players.findIndex(p => p[1] === position);
+      if (playerIndex !== -1) {
+        const player = players[playerIndex];
+        starters.push([player[0], player[1]]);
+        backups.splice(backups.indexOf(player), 1); // Remove starter from backups
+      } else {
+        starters.push([`No starter for ${position}`, position]);
+      }
+    });
+
+    console.log('Starters:', starters);
+    console.log('Backups:', backups);
+
+    startersList.innerHTML = starters.map(player => player[0].includes('No starter') ? `<li>${player[0]}</li>` : `<li>${player[0]} - ${player[1]}</li>`).join('');
+    backupsList.innerHTML = backups.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
+  }
+});
