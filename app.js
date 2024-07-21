@@ -68,4 +68,68 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('API_KEY:', API_KEY);
   console.log('SHEET_ID:', SHEET_ID);
   console.log('CLIENT_ID:', CLIENT_ID);
+
+  document.getElementById('record-play').addEventListener('click', function() {
+    const playType = document.getElementById('play-type').value;
+    const play = document.getElementById('play').value;
+    const yardage = document.getElementById('yardage').value;
+    const lineup = [...document.getElementById('starters').children].map(li => li.textContent).join(', ');
+
+    console.log('Recording play');
+    console.log('Play Type:', playType);
+    console.log('Play:', play);
+    console.log('Yardage:', yardage);
+    console.log('Lineup:', lineup);
+
+    const playData = [
+      [new Date().toISOString(), lineup, play, yardage, playType]
+    ];
+
+    console.log('Play Data to Append:', playData);
+
+    gapi.client.sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID,
+      range: 'Play Data!A2:E',
+      valueInputOption: 'RAW',
+      resource: {
+        values: playData
+      }
+    }).then(function(response) {
+      console.log('Play recorded:', response);
+      updateBestPlays();
+    }).catch(function(error) {
+      console.error('Error recording play:', error);
+    });
+  });
 });
+
+function updateBestPlays() {
+  console.log('Updating best plays...');
+  gapi.client.sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: 'Play Data!A2:E'
+  }).then(function(response) {
+    const plays = response.result.values;
+    const playStats = {};
+
+    plays.forEach(play => {
+      const [ , lineup, playName, yardage, playType] = play;
+      if (!playStats[playName]) {
+        playStats[playName] = { totalYardage: 0, count: 0, type: playType };
+      }
+      playStats[playName].totalYardage += parseInt(yardage);
+      playStats[playName].count += 1;
+    });
+
+    const sortedPlays = Object.entries(playStats).map(([playName, stats]) => ({
+      playName,
+      averageYardage: stats.totalYardage / stats.count,
+      type: stats.type
+    })).sort((a, b) => b.type === 'Offense' ? b.averageYardage - a.averageYardage : a.averageYardage - b.averageYardage);
+
+    const bestPlaysList = document.getElementById('best-plays');
+    bestPlaysList.innerHTML = sortedPlays.map(play => `<li>${play.playName} (${play.type}) - ${play.averageYardage.toFixed(2)} yards</li>`).join('');
+  }).catch(function(error) {
+    console.error('Error updating best plays:', error);
+  });
+}
