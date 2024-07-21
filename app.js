@@ -3,29 +3,85 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const API_KEY = 'AIzaSyBQT0HSLG0Duc7iRvcDtv5PFAGXknTk-aY';
   const SHEET_ID = '1e0EMRqmzGXB9etrRNMW7luqSsxehVeliGaTR8i8ASFw';
+  const CLIENT_ID = '897172538215-q7h3a6je890n0ctgd4ca6cg1uv6eha9g.apps.googleusercontent.com';
+  const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
 
   console.log('API_KEY:', API_KEY);
   console.log('SHEET_ID:', SHEET_ID);
+  console.log('CLIENT_ID:', CLIENT_ID);
 
-  // Function to load the Google Sheets data
-  function loadSheetsData() {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values:batchGet?ranges=Depth Chart!A2:Z&ranges=Play Data!A2:E&key=${API_KEY}`;
+  let tokenClient;
+  let gapiInited = false;
+  let gisInited = false;
 
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        console.log('Sheets data loaded:', data);
-        const players = data.valueRanges[0].values || [];
-        const plays = data.valueRanges[1].values || [];
-        console.log('Players:', players);
-        console.log('Plays:', plays);
-        renderDepthChart(players);
-        updateBestPlays(plays);
-      })
-      .catch(error => console.error('Error loading sheets data:', error));
+  document.getElementById('record-play').addEventListener('click', handleAuthClick);
+
+  function gapiLoaded() {
+    gapi.load('client', initializeGapiClient);
   }
 
-  // Function to render the depth chart
+  function initializeGapiClient() {
+    gapi.client.init({
+      apiKey: API_KEY,
+      discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+    }).then(function() {
+      gapiInited = true;
+      maybeEnableButtons();
+    });
+  }
+
+  function gisLoaded() {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: SCOPES,
+      callback: '', // defined later
+    });
+    gisInited = true;
+    maybeEnableButtons();
+  }
+
+  function maybeEnableButtons() {
+    if (gapiInited && gisInited) {
+      document.getElementById('record-play').style.visibility = 'visible';
+    }
+  }
+
+  function handleAuthClick() {
+    tokenClient.callback = async (resp) => {
+      if (resp.error !== undefined) {
+        throw (resp);
+      }
+      await loadSheetsData();
+    };
+
+    if (gapi.client.getToken() === null) {
+      // Prompt the user to select a Google Account and ask for consent to share their data
+      tokenClient.requestAccessToken({ prompt: 'consent' });
+    } else {
+      // Skip display of account chooser and consent dialog for an existing token
+      tokenClient.requestAccessToken({ prompt: '' });
+    }
+  }
+
+  async function loadSheetsData() {
+    try {
+      const response = await gapi.client.sheets.spreadsheets.values.batchGet({
+        spreadsheetId: SHEET_ID,
+        ranges: ['Depth Chart!A2:Z1000', 'Play Data!A2:E1000'],
+      });
+      const data = response.result;
+      console.log('Sheets data loaded:', data);
+      const players = data.valueRanges[0].values || [];
+      const plays = data.valueRanges[1].values || [];
+      console.log('Players:', players);
+      console.log('Plays:', plays);
+      renderDepthChart(players);
+      updateBestPlays(plays);
+    } catch (error) {
+      console.error('Error loading sheets data:', error);
+    }
+  }
+
   function renderDepthChart(players) {
     console.log('Rendering depth chart');
     const startersList = document.getElementById('starters');
@@ -54,7 +110,6 @@ document.addEventListener('DOMContentLoaded', function() {
     backupsList.innerHTML = backups.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
   }
 
-  // Function to update the best plays
   function updateBestPlays(plays) {
     console.log('Updating best plays');
     const playStats = {};
@@ -78,7 +133,6 @@ document.addEventListener('DOMContentLoaded', function() {
     bestPlaysList.innerHTML = sortedPlays.map(play => `<li>${play.playName} (${play.type}) - ${play.averageYardage.toFixed(2)} yards</li>`).join('');
   }
 
-  // Event listener for recording a play
   document.getElementById('record-play').addEventListener('click', function() {
     const playType = document.getElementById('play-type').value;
     const play = document.getElementById('play').value.trim();
@@ -108,7 +162,8 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${gapi.auth.getToken().access_token}`
       },
       body: JSON.stringify({ values: playData })
     }).then(response => response.json())
@@ -119,5 +174,6 @@ document.addEventListener('DOMContentLoaded', function() {
       .catch(error => console.error('Error recording play:', error));
   });
 
-  loadSheetsData(); // Initial load
+  gapiLoaded();
+  gisLoaded();
 });
