@@ -81,6 +81,11 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Yardage:', yardage);
     console.log('Lineup:', lineup);
 
+    if (!playType || !play || !yardage || !lineup) {
+      console.error('Missing required fields: ', { playType, play, yardage, lineup });
+      return;
+    }
+
     const playData = [
       [new Date().toISOString(), lineup, play, yardage, playType]
     ];
@@ -99,7 +104,9 @@ document.addEventListener('DOMContentLoaded', function() {
       updateBestPlays();
     }).catch(function(error) {
       console.error('Error recording play:', error);
-      console.error('Error details:', error.result.error);
+      if (error.result && error.result.error) {
+        console.error('Error details:', error.result.error);
+      }
     });
   });
 });
@@ -111,6 +118,11 @@ function updateBestPlays() {
     range: 'Play Data!A2:E'
   }).then(function(response) {
     const plays = response.result.values;
+    if (!plays || plays.length === 0) {
+      console.log('No play data available');
+      return;
+    }
+
     const playStats = {};
 
     plays.forEach(play => {
