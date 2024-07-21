@@ -46,18 +46,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const positions = ['Center', 'Quarter Back', 'Full Back', 'Left Guard', 'Right Guard', 'Left Tackle', 'Right Tackle', 'Left Tight End', 'Right Tight End', 'Left Wing Back', 'Right Wing Back'];
 
-    const starters = positions.map(position => {
-      const player = players.find(p => p[1] === position);
-      return player ? [player[0], player[1]] : [`No starter for ${position}`, position];
-    });
+    const starters = [];
+    const backups = [...players];
 
-    const backupPositions = new Set(starters.map(starter => starter[1]));
-    const backups = players.filter(player => !backupPositions.has(player[1]));
+    positions.forEach(position => {
+      const playerIndex = players.findIndex(p => p[1] === position);
+      if (playerIndex !== -1) {
+        const player = players[playerIndex];
+        starters.push([player[0], player[1]]);
+        backups.splice(backups.indexOf(player), 1); // Remove starter from backups
+      } else {
+        starters.push([`No starter for ${position}`, position]);
+      }
+    });
 
     console.log('Starters:', starters);
     console.log('Backups:', backups);
 
-    startersList.innerHTML = starters.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
+    startersList.innerHTML = starters.map(player => player[0].includes('No starter') ? `<li>${player[0]}</li>` : `<li>${player[0]} - ${player[1]}</li>`).join('');
     backupsList.innerHTML = backups.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
   }
 
@@ -98,27 +104,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     gapi.client.sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
-      range: 'Play Data!A2',
-      valueInputOption: 'RAW',
-      resource: {
-        values: [[new Date(), lineup, play, yardage, playType]],
-        majorDimension: 'ROWS'
-      }
-    }).then(function(response) {
-      console.log('Play recorded:', response);
-      loadSheetsData(); // Refresh data after recording a play
-    }, function(error) {
-      console.error('Error recording play:', error);
-    });
-  });
-
-  document.getElementById('minus').addEventListener('click', () => {
-    const yardageInput = document.getElementById('yardage');
-    yardageInput.value = (parseInt(yardageInput.value) || 0) - 1;
-  });
-
-  document.getElementById('plus').addEventListener('click', () => {
-    const yardageInput = document.getElementById('yardage');
-    yardageInput.value = (parseInt(yardageInput.value) || 0) + 1;
-  });
-});
+      range
