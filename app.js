@@ -99,6 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
       updateBestPlays();
     }).catch(function(error) {
       console.error('Error recording play:', error);
+      console.error('Error details:', error.result.error);
     });
   });
 });
