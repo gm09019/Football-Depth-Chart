@@ -23,18 +23,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function loadSheetsData() {
     console.log('Loading sheets data...');
-    gapi.client.sheets.spreadsheets.values.get({
+    gapi.client.sheets.spreadsheets.values.batchGet({
       spreadsheetId: SHEET_ID,
-      range: 'Depth Chart!A2:Z'
+      ranges: ['Depth Chart!A2:Z', 'Play Data!A2:E']
     }).then(function(response) {
       console.log('Sheets data loaded:', response);
-      if (response.result.values) {
-        const players = response.result.values;
-        console.log('Players:', players);
-        renderDepthChart(players);
-      } else {
-        console.log('No data found in the specified range.');
-      }
+      const players = response.result.valueRanges[0].values;
+      const plays = response.result.valueRanges[1].values;
+      console.log('Players:', players);
+      console.log('Plays:', plays);
+      renderDepthChart(players);
+      updateBestPlays(plays);
     }, function(error) {
       console.error('Error loading sheets data:', error);
     });
@@ -71,4 +70,65 @@ document.addEventListener('DOMContentLoaded', function() {
     startersList.innerHTML = starters.map(player => player.length > 1 ? `<li>${player[0]} - ${player[1]}</li>` : `<li>${player[0]}</li>`).join('');
     backupsList.innerHTML = backups.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
   }
+
+  function updateBestPlays(plays) {
+    console.log('Updating best plays');
+    const bestPlaysList = document.getElementById('best-plays');
+    const playStats = {};
+
+    plays.forEach(play => {
+      const [ , lineup, playName, yardage, playType] = play;
+      if (!playStats[playName]) {
+        playStats[playName] = { totalYardage: 0, count: 0, type: playType };
+      }
+      playStats[playName].totalYardage += parseInt(yardage);
+      playStats[playName].count += 1;
+    });
+
+    const sortedPlays = Object.entries(playStats).map(([playName, stats]) => ({
+      playName,
+      averageYardage: stats.totalYardage / stats.count,
+      type: stats.type
+    })).sort((a, b) => b.type === 'Offense' ? b.averageYardage - a.averageYardage : a.averageYardage - b.averageYardage);
+
+    bestPlaysList.innerHTML = sortedPlays.map(play => `<li>${play.playName} (${play.type}) - ${play.averageYardage.toFixed(2)} yards</li>`).join('');
+  }
+
+  document.getElementById('record-play').addEventListener('click', function() {
+    const playType = document.getElementById('play-type').value;
+    const play = document.getElementById('play').value;
+    const yardage = document.getElementById('yardage').value;
+    const lineup = [...document.getElementById('starters').children].map(li => li.textContent).join(', ');
+
+    console.log('Recording play');
+    console.log('Play Type:', playType);
+    console.log('Play:', play);
+    console.log('Yardage:', yardage);
+    console.log('Lineup:', lineup);
+
+    gapi.client.sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID,
+      range: 'Play Data!A2',
+      valueInputOption: 'RAW',
+      resource: {
+        values: [[new Date(), lineup, play, yardage, playType]],
+        majorDimension: 'ROWS'
+      }
+    }).then(function(response) {
+      console.log('Play recorded:', response);
+      loadSheetsData(); // Refresh data after recording a play
+    }, function(error) {
+      console.error('Error recording play:', error);
+    });
+  });
+
+  document.getElementById('minus').addEventListener('click', () => {
+    const yardageInput = document.getElementById('yardage');
+    yardageInput.value = (parseInt(yardageInput.value) || 0) - 1;
+  });
+
+  document.getElementById('plus').addEventListener('click', () => {
+    const yardageInput = document.getElementById('yardage');
+    yardageInput.value = (parseInt(yardageInput.value) || 0) + 1;
+  });
 });
