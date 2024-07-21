@@ -4,59 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Football Depth Chart</title>
-  <script>
-    var gapiInitialized = false;
-    var gisInitialized = false;
-
-    var API_KEY = 'AIzaSyBQT0HSLG0Duc7iRvcDtv5PFAGXknTk-aY';
-    var CLIENT_ID = '897172538215-q7h3a6je890n0ctgd4ca6cg1uv6eha9g.apps.googleusercontent.com';
-    var SHEET_ID = '1e0EMRqmzGXB9etrRNMW7luqSsxehVeliGaTR8i8ASFw';
-
-    function gapiLoaded() {
-      console.log('GAPI library loaded');
-      gapi.load('client', initializeGapiClient);
-    }
-
-    function gisLoaded() {
-      console.log('GIS library loaded');
-      gisInitialized = true;
-    }
-
-    function initializeGapiClient() {
-      if (!gisInitialized) return;
-
-      gapi.client.init({
-        apiKey: API_KEY,
-        discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
-      }).then(function () {
-        console.log('GAPI client initialized');
-        loadSheetsData();
-      }).catch(function(error) {
-        console.error('GAPI client initialization error:', error);
-      });
-    }
-  </script>
-  <script src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
-  <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
-  <script src="app.js" defer></script>
 </head>
 <body>
-  <div id="g_id_onload"
-       data-client_id="897172538215-q7h3a6je890n0ctgd4ca6cg1uv6eha9g.apps.googleusercontent.com"
-       data-auto_select="true"
-       data-callback="handleCredentialResponse">
-  </div>
-  <div class="g_id_signin" data-type="standard"></div>
-
+  <h1>Football Depth Chart</h1>
+  <img src="mason_black.jpg" alt="Youth Football Logo">
+  <h2>Starters</h2>
   <ul id="starters"></ul>
+  <h2>Backups</h2>
   <ul id="backups"></ul>
+  <h2>Best Plays</h2>
   <ul id="best-plays"></ul>
-  <input id="play-type" type="text" placeholder="Play Type">
-  <input id="play" type="text" placeholder="Play">
-  <input id="yardage" type="number" placeholder="Yardage">
+  <h2>Record Play</h2>
+  <div>
+    <label for="play-type">Play Type:</label>
+    <select id="play-type">
+      <option value="Offense">Offense</option>
+      <option value="Defense">Defense</option>
+    </select>
+  </div>
+  <div>
+    <label for="play">Play:</label>
+    <input type="text" id="play">
+  </div>
+  <div>
+    <label for="yardage">Yardage:</label>
+    <input type="number" id="yardage" value="0">
+  </div>
   <button id="record-play">Record Play</button>
-  <button id="minus">-</button>
-  <button id="plus">+</button>
+  <script src="app.js"></script>
 </body>
 </html>
