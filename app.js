@@ -19,9 +19,12 @@ document.addEventListener('DOMContentLoaded', function() {
       scope: "https://www.googleapis.com/auth/spreadsheets"
     }).then(function () {
       console.log('GAPI client initialized');
-      gapi.auth2.getAuthInstance().signIn().then(loadSheetsData);
-    }, function(error) {
+      gapi.auth2.getAuthInstance().signIn().then(loadSheetsData).catch(function(error) {
+        console.error('Error during sign-in:', error);
+      });
+    }).catch(function(error) {
       console.error('Error initializing GAPI client:', error);
+      console.log('Error details:', error.details);
     });
   }
 
@@ -38,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('Plays:', plays);
       renderDepthChart(players);
       updateBestPlays(plays);
-    }, function(error) {
+    }).catch(function(error) {
       console.error('Error loading sheets data:', error);
     });
   }
@@ -126,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }).then(function(response) {
       console.log('Play recorded:', response);
       loadSheetsData(); // Refresh data after recording a play
-    }, function(error) {
+    }).catch(function(error) {
       console.error('Error recording play:', error);
     });
   });
