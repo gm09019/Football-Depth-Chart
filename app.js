@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM fully loaded and parsed');
 
-  const API_KEY = 'AIzaSyBQT0HSLG0Duc7iRvcDtv5PFAGXknTk-aY'; // Replace with your actual API key
+  const API_KEY = 'AIzaSyBQT0HSLG0Duc7iRvcDtv5PFAGXknTk-aY';
   const SHEET_ID = '1e0EMRqmzGXB9etrRNMW7luqSsxehVeliGaTR8i8ASFw';
 
   console.log('API_KEY:', API_KEY);
