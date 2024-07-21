@@ -28,9 +28,13 @@ document.addEventListener('DOMContentLoaded', function() {
       range: 'Depth Chart!A2:Z'
     }).then(function(response) {
       console.log('Sheets data loaded:', response);
-      const players = response.result.values;
-      console.log('Players:', players);
-      renderDepthChart(players);
+      if (response.result.values) {
+        const players = response.result.values;
+        console.log('Players:', players);
+        renderDepthChart(players);
+      } else {
+        console.log('No data found in the specified range.');
+      }
     }, function(error) {
       console.error('Error loading sheets data:', error);
     });
@@ -53,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Starters:', starters);
     console.log('Backups:', backups);
 
-    startersList.innerHTML = starters.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
+    startersList.innerHTML = starters.map(player => player ? `<li>${player[0]} - ${player[1]}</li>` : `<li>No starter for ${positions[starters.indexOf(player)]}</li>`).join('');
     backupsList.innerHTML = backups.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
   }
 });
