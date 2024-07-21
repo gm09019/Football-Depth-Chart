@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Event listener for recording a play
   document.getElementById('record-play').addEventListener('click', function() {
     const playType = document.getElementById('play-type').value;
-    const play = document.getElementById('play').value;
+    const play = document.getElementById('play').value.trim();
     const yardage = document.getElementById('yardage').value;
     const lineup = [...document.getElementById('starters').children].map(li => li.textContent).join(', ');
 
@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (!playType || !play || !yardage || !lineup) {
       console.error('Missing required fields:', { playType, play, yardage, lineup });
+      alert('Please fill in all fields before recording the play.');
       return;
     }
 
