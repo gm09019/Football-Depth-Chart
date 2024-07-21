@@ -42,6 +42,8 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('Sheets data loaded:', response);
       const players = response.result.valueRanges[0].values;
       const plays = response.result.valueRanges[1].values;
+      console.log('Players:', players);
+      console.log('Plays:', plays);
       renderDepthChart(players);
       renderPlays(plays);
     }, function(error) {
@@ -59,6 +61,9 @@ document.addEventListener('DOMContentLoaded', function() {
       return player;
     });
     const backups = players.filter(player => !starters.includes(player));
+
+    console.log('Starters:', starters);
+    console.log('Backups:', backups);
 
     startersList.innerHTML = starters.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
     backupsList.innerHTML = backups.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
@@ -101,6 +106,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const starters = [...document.getElementById('starters').children].map(li => li.textContent.split(' - ')[0]);
     const backups = [...document.getElementById('backups').children].map(li => li.textContent.split(' - ')[0]);
 
+    console.log('Swapping players');
+    console.log('Starters:', starters);
+    console.log('Backups:', backups);
+
     gapi.client.sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
       range: 'Depth Chart!A2',
@@ -119,6 +128,10 @@ document.addEventListener('DOMContentLoaded', function() {
   function saveDepthChart() {
     const starters = [...document.getElementById('starters').children].map(li => li.textContent.split(' - ')[0]);
     const backups = [...document.getElementById('backups').children].map(li => li.textContent.split(' - ')[0]);
+
+    console.log('Saving depth chart');
+    console.log('Starters:', starters);
+    console.log('Backups:', backups);
 
     gapi.client.sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
@@ -141,6 +154,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const yardage = document.getElementById('yardage').value;
     const lineup = [...document.getElementById('starters').children].map(li => li.textContent).join(', ');
 
+    console.log('Recording play');
+    console.log('Play Type:', playType);
+    console.log('Play:', play);
+    console.log('Yardage:', yardage);
+    console.log('Lineup:', lineup);
+
     gapi.client.sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
       range: 'Play Data!A2',
@@ -158,6 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   function updateBestPlays() {
+    console.log('Updating best plays');
     gapi.client.sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
       range: 'Play Data!A2:E'
