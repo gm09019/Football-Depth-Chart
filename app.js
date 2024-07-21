@@ -34,13 +34,16 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function loadSheetsData() {
-    gapi.client.sheets.spreadsheets.values.get({
+    console.log('Loading sheets data...');
+    gapi.client.sheets.spreadsheets.values.batchGet({
       spreadsheetId: SHEET_ID,
-      range: 'Depth Chart!A2:Z'
+      ranges: ['Depth Chart!A2:Z', 'Plays!A2:Z']
     }).then(function(response) {
       console.log('Sheets data loaded:', response);
-      const players = response.result.values;
+      const players = response.result.valueRanges[0].values;
+      const plays = response.result.valueRanges[1].values;
       renderDepthChart(players);
+      renderPlays(plays);
     }, function(error) {
       console.error('Error loading sheets data:', error);
     });
@@ -49,8 +52,12 @@ document.addEventListener('DOMContentLoaded', function() {
   function renderDepthChart(players) {
     console.log('Rendering depth chart');
     const positions = ['Center', 'Quarter Back', 'Full Back', 'Left Guard', 'Right Guard', 'Left Tackle', 'Right Tackle', 'Left Tight End', 'Right Tight End', 'Left Wing Back', 'Right Wing Back'];
-    
-    const starters = positions.map(position => players.find(player => player.includes(position)));
+
+    const starters = positions.map(position => {
+      const player = players.find(player => player.includes(position));
+      console.log('Found starter for position', position, player);
+      return player;
+    });
     const backups = players.filter(player => !starters.includes(player));
 
     startersList.innerHTML = starters.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
@@ -67,6 +74,12 @@ document.addEventListener('DOMContentLoaded', function() {
       animation: 150,
       onEnd: handlePlayerMove
     });
+  }
+
+  function renderPlays(plays) {
+    console.log('Rendering plays');
+    const playsList = document.getElementById('plays');
+    playsList.innerHTML = plays.map(play => `<li>${play[2]} (${play[4]}) - ${play[3]} yards</li>`).join('');
   }
 
   function handlePlayerMove(evt) {
