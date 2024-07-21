@@ -16,9 +16,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('record-play').addEventListener('click', handleAuthClick);
 
-  function gapiLoaded() {
+  window.gapiLoaded = function() {
     gapi.load('client', initializeGapiClient);
-  }
+  };
+
+  window.gisLoaded = function() {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: SCOPES,
+      callback: '', // defined later
+    });
+    gisInited = true;
+    maybeEnableButtons();
+  };
 
   function initializeGapiClient() {
     gapi.client.init({
@@ -28,16 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
       gapiInited = true;
       maybeEnableButtons();
     });
-  }
-
-  function gisLoaded() {
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID,
-      scope: SCOPES,
-      callback: '', // defined later
-    });
-    gisInited = true;
-    maybeEnableButtons();
   }
 
   function maybeEnableButtons() {
