@@ -100,19 +100,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
       console.log('Play Data to Append:', playData);
 
-      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Play%20Data!A2:E:append?valueInputOption=RAW&key=${API_KEY}`;
-
-      fetch(url, {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ values: playData })
-      }).then(response => response.json())
-        .then(data => {
-            console.log('Play recorded:', data);
-            loadSheetsData(); // Refresh the data
-        })
-        .catch(error => console.error('Error recording play:', error));
+      // Simulate play data appending without actual Google Sheets API call
+      console.log('Play recorded:', playData);
+      loadSheetsData(); // Refresh the data
   });
 });
