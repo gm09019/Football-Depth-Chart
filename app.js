@@ -2,20 +2,24 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM fully loaded and parsed');
 
   const API_KEY = 'AIzaSyBQT0HSLG0Duc7iRvcDtv5PFAGXknTk-aY';
+  const CLIENT_ID = '897172538215-q7h3a6je890n0ctgd4ca6cg1uv6eha9g.apps.googleusercontent.com'; // Replace with your actual client ID
   const SHEET_ID = '1e0EMRqmzGXB9etrRNMW7luqSsxehVeliGaTR8i8ASFw';
 
   console.log('API_KEY:', API_KEY);
   console.log('SHEET_ID:', SHEET_ID);
+  console.log('CLIENT_ID:', CLIENT_ID);
 
-  gapi.load('client', initClient);
+  gapi.load('client:auth2', initClient);
 
   function initClient() {
     gapi.client.init({
       apiKey: API_KEY,
+      clientId: CLIENT_ID,
       discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
+      scope: "https://www.googleapis.com/auth/spreadsheets"
     }).then(function () {
       console.log('GAPI client initialized');
-      loadSheetsData();
+      gapi.auth2.getAuthInstance().signIn().then(loadSheetsData);
     }, function(error) {
       console.error('Error initializing GAPI client:', error);
     });
