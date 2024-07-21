@@ -5,16 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Football Depth Chart</title>
   <script async defer src="https://accounts.google.com/gsi/client"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
   <script src="app.js" defer></script>
 </head>
 <body>
-  <!-- Your HTML content here -->
   <div id="g_id_onload"
        data-client_id="897172538215-q7h3a6je890n0ctgd4ca6cg1uv6eha9g.apps.googleusercontent.com"
-       data-context="signin"
-       data-ux_mode="popup"
+       data-auto_select="true"
        data-callback="handleCredentialResponse">
   </div>
+  <div class="g_id_signin" data-type="standard"></div>
+
   <ul id="starters"></ul>
   <ul id="backups"></ul>
   <ul id="best-plays"></ul>

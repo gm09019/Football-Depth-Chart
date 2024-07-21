@@ -10,21 +10,23 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('CLIENT_ID:', CLIENT_ID);
 
   window.handleCredentialResponse = (response) => {
-    console.log('Credential Response', response);
+    console.log('Credential Response:', response);
     const user = jwt_decode(response.credential);
     console.log('User:', user);
     initClient();
   };
 
   function initClient() {
-    gapi.client.init({
-      apiKey: API_KEY,
-      discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
-    }).then(function () {
-      console.log('GAPI client initialized');
-      loadSheetsData();
-    }).catch(function(error) {
-      console.error('GAPI client initialization error:', error);
+    gapi.load('client', () => {
+      gapi.client.init({
+        apiKey: API_KEY,
+        discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
+      }).then(function () {
+        console.log('GAPI client initialized');
+        loadSheetsData();
+      }).catch(function(error) {
+        console.error('GAPI client initialization error:', error);
+      });
     });
   }
 
