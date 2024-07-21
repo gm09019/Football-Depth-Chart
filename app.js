@@ -1,9 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('Testing change detection');
+  console.log('DOM fully loaded and parsed');
 
-  // Existing code follows...
-});
-document.addEventListener('DOMContentLoaded', function() {
   const startersList = document.getElementById('starters');
   const backupsList = document.getElementById('backups');
   const bestPlaysList = document.getElementById('best-plays');
@@ -13,7 +10,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const API_KEY = 'AIzaSyBQT0HSLG0Duc7iRvcDtv5PFAGXknTk-aY'; // Replace with your actual API key
   const SHEET_ID = '1e0EMRqmzGXB9etrRNMW7luqSsxehVeliGaTR8i8ASFw';
-  const CLIENT_ID = 'football-depth-chart-service-a@lexical-period-406219.iam.gserviceaccount.com'; // Replace with your client email
+  const CLIENT_ID = '897172538215-q7h3a6je890n0ctgd4ca6cg1uv6eha9g.apps.googleusercontent.com'; // Replace with your actual client ID
+
+  console.log('API_KEY:', API_KEY);
+  console.log('SHEET_ID:', SHEET_ID);
+  console.log('CLIENT_ID:', CLIENT_ID);
 
   gapi.load('client:auth2', initClient);
 
@@ -24,7 +25,12 @@ document.addEventListener('DOMContentLoaded', function() {
       discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
       scope: "https://www.googleapis.com/auth/spreadsheets"
     }).then(function () {
-      gapi.auth2.getAuthInstance().signIn().then(loadSheetsData);
+      console.log('GAPI client initialized');
+      gapi.auth2.getAuthInstance().signIn().then(loadSheetsData, function(error) {
+        console.error('Error signing in:', error);
+      });
+    }, function(error) {
+      console.error('Error initializing GAPI client:', error);
     });
   }
 
@@ -33,12 +39,16 @@ document.addEventListener('DOMContentLoaded', function() {
       spreadsheetId: SHEET_ID,
       range: 'Depth Chart!A2:Z'
     }).then(function(response) {
+      console.log('Sheets data loaded:', response);
       const players = response.result.values;
       renderDepthChart(players);
+    }, function(error) {
+      console.error('Error loading sheets data:', error);
     });
   }
 
   function renderDepthChart(players) {
+    console.log('Rendering depth chart');
     const positions = ['Center', 'Quarter Back', 'Full Back', 'Left Guard', 'Right Guard', 'Left Tackle', 'Right Tackle', 'Left Tight End', 'Right Tight End', 'Left Wing Back', 'Right Wing Back'];
     
     const starters = positions.map(position => players.find(player => player.includes(position)));
@@ -87,6 +97,10 @@ document.addEventListener('DOMContentLoaded', function() {
         values: [starters.concat(backups)],
         majorDimension: 'COLUMNS'
       }
+    }).then(function(response) {
+      console.log('Depth chart updated:', response);
+    }, function(error) {
+      console.error('Error updating depth chart:', error);
     });
   }
 
@@ -102,6 +116,10 @@ document.addEventListener('DOMContentLoaded', function() {
         values: [starters.concat(backups)],
         majorDimension: 'COLUMNS'
       }
+    }).then(function(response) {
+      console.log('Depth chart saved:', response);
+    }, function(error) {
+      console.error('Error saving depth chart:', error);
     });
   }
 
@@ -119,7 +137,12 @@ document.addEventListener('DOMContentLoaded', function() {
         values: [[new Date(), lineup, play, yardage, playType]],
         majorDimension: 'ROWS'
       }
-    }).then(updateBestPlays);
+    }).then(function(response) {
+      console.log('Play recorded:', response);
+      updateBestPlays();
+    }, function(error) {
+      console.error('Error recording play:', error);
+    });
   });
 
   function updateBestPlays() {
@@ -146,6 +169,8 @@ document.addEventListener('DOMContentLoaded', function() {
       })).sort((a, b) => b.type === 'Offense' ? b.averageYardage - a.averageYardage : a.averageYardage - b.averageYardage);
 
       bestPlaysList.innerHTML = sortedPlays.map(play => `<li>${play.playName} (${play.type}) - ${play.averageYardage.toFixed(2)} yards</li>`).join('');
+    }, function(error) {
+      console.error('Error updating best plays:', error);
     });
   }
 
