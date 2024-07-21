@@ -47,20 +47,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const positions = ['Center', 'Quarter Back', 'Full Back', 'Left Guard', 'Right Guard', 'Left Tackle', 'Right Tackle', 'Left Tight End', 'Right Tight End', 'Left Wing Back', 'Right Wing Back'];
 
     const starters = [];
-    const backups = [];
+    const backups = [...players];
 
     positions.forEach(position => {
-      const player = players.find(p => p[1] === position);
-      if (player) {
+      const playerIndex = players.findIndex(p => p[1] === position);
+      if (playerIndex !== -1) {
+        const player = players[playerIndex];
         starters.push(player);
+        backups.splice(backups.indexOf(player), 1); // Remove starter from backups
       } else {
         starters.push([`No starter for ${position}`]);
-      }
-    });
-
-    players.forEach(player => {
-      if (!positions.includes(player[1])) {
-        backups.push(player);
       }
     });
 
