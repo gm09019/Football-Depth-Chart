@@ -36,11 +36,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }).then(function(response) {
       console.log('Sheets data loaded:', response);
       const players = response.result.valueRanges[0].values;
-      const plays = response.result.valueRanges[1] ? response.result.valueRanges[1].values : [];
       console.log('Players:', players);
-      console.log('Plays:', plays);
       renderDepthChart(players);
-      updateBestPlays(plays);
     }).catch(function(error) {
       console.error('Error loading sheets data:', error);
     });
@@ -51,96 +48,4 @@ document.addEventListener('DOMContentLoaded', function() {
     const startersList = document.getElementById('starters');
     const backupsList = document.getElementById('backups');
 
-    const positions = ['Center', 'Quarter Back', 'Full Back', 'Left Guard', 'Right Guard', 'Left Tackle', 'Right Tackle', 'Left Tight End', 'Right Tight End', 'Left Wing Back', 'Right Wing Back'];
-
-    const starters = [];
-    const backups = [...players];
-
-    positions.forEach(position => {
-      const playerIndex = players.findIndex(p => p[1] === position);
-      if (playerIndex !== -1) {
-        const player = players[playerIndex];
-        starters.push([player[0], player[1]]);
-        backups.splice(backups.indexOf(player), 1); // Remove starter from backups
-      } else {
-        starters.push([`No starter for ${position}`, position]);
-      }
-    });
-
-    console.log('Starters:', starters);
-    console.log('Backups:', backups);
-
-    startersList.innerHTML = starters.map(player => player[0].includes('No starter') ? `<li>${player[0]}</li>` : `<li>${player[0]} - ${player[1]}</li>`).join('');
-    backupsList.innerHTML = backups.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
-  }
-
-  function updateBestPlays(plays) {
-    console.log('Updating best plays');
-    const bestPlaysList = document.getElementById('best-plays');
-    const playStats = {};
-
-    if (!plays || plays.length === 0) {
-      bestPlaysList.innerHTML = `<li>No play data available</li>`;
-      return;
-    }
-
-    plays.forEach(play => {
-      const [ , lineup, playName, yardage, playType] = play;
-      if (!playStats[playName]) {
-        playStats[playName] = { totalYardage: 0, count: 0, type: playType };
-      }
-      playStats[playName].totalYardage += parseInt(yardage);
-      playStats[playName].count += 1;
-    });
-
-    const sortedPlays = Object.entries(playStats).map(([playName, stats]) => ({
-      playName,
-      averageYardage: stats.totalYardage / stats.count,
-      type: stats.type
-    })).sort((a, b) => b.type === 'Offense' ? b.averageYardage - a.averageYardage : a.averageYardage - b.averageYardage);
-
-    bestPlaysList.innerHTML = sortedPlays.map(play => `<li>${play.playName} (${play.type}) - ${play.averageYardage.toFixed(2)} yards</li>`).join('');
-  }
-
-  document.getElementById('record-play').addEventListener('click', function() {
-    const playType = document.getElementById('play-type').value;
-    const play = document.getElementById('play').value;
-    const yardage = document.getElementById('yardage').value;
-    const lineup = [...document.getElementById('starters').children].map(li => li.textContent).join(', ');
-
-    console.log('Recording play');
-    console.log('Play Type:', playType);
-    console.log('Play:', play);
-    console.log('Yardage:', yardage);
-    console.log('Lineup:', lineup);
-
-    const playData = [new Date().toISOString(), lineup, play, yardage, playType];
-
-    console.log('Play Data to Append:', playData);
-
-    gapi.client.sheets.spreadsheets.values.append({
-      spreadsheetId: SHEET_ID,
-      range: 'Play Data!A2:E',
-      valueInputOption: 'RAW',
-      resource: {
-        values: [playData],
-        majorDimension: 'ROWS'
-      }
-    }).then(function(response) {
-      console.log('Play recorded:', response);
-      loadSheetsData(); // Refresh data after recording a play
-    }).catch(function(error) {
-      console.error('Error recording play:', error);
-    });
-  });
-
-  document.getElementById('minus').addEventListener('click', () => {
-    const yardageInput = document.getElementById('yardage');
-    yardageInput.value = (parseInt(yardageInput.value) || 0) - 1;
-  });
-
-  document.getElementById('plus').addEventListener('click', () => {
-    const yardageInput = document.getElementById('yardage');
-    yardageInput.value = (parseInt(yardageInput.value) || 0) + 1;
-  });
-});
+    const positions = ['Center', 'Quarter Back', '
