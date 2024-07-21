@@ -1,11 +1,25 @@
 let gapiInitialized = false;
 let gisInitialized = false;
 
+const API_KEY = 'AIzaSyBQT0HSLG0Duc7iRvcDtv5PFAGXknTk-aY';
+const CLIENT_ID = '897172538215-q7h3a6je890n0ctgd4ca6cg1uv6eha9g.apps.googleusercontent.com';
+const SHEET_ID = '1e0EMRqmzGXB9etrRNMW7luqSsxehVeliGaTR8i8ASFw';
+
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM fully loaded and parsed');
+
+  console.log('API_KEY:', API_KEY);
+  console.log('SHEET_ID:', SHEET_ID);
+  console.log('CLIENT_ID:', CLIENT_ID);
+});
+
 function gapiLoaded() {
+  console.log('GAPI library loaded');
   gapi.load('client', initializeGapiClient);
 }
 
 function gisLoaded() {
+  console.log('GIS library loaded');
   gisInitialized = true;
 }
 
@@ -72,15 +86,3 @@ function renderDepthChart(players) {
   startersList.innerHTML = starters.map(player => player[0].includes('No starter') ? `<li>${player[0]}</li>` : `<li>${player[0]} - ${player[1]}</li>`).join('');
   backupsList.innerHTML = backups.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM fully loaded and parsed');
-
-  const API_KEY = 'AIzaSyBQT0HSLG0Duc7iRvcDtv5PFAGXknTk-aY';
-  const CLIENT_ID = '897172538215-q7h3a6je890n0ctgd4ca6cg1uv6eha9g.apps.googleusercontent.com';
-  const SHEET_ID = '1e0EMRqmzGXB9etrRNMW7luqSsxehVeliGaTR8i8ASFw';
-
-  console.log('API_KEY:', API_KEY);
-  console.log('SHEET_ID:', SHEET_ID);
-  console.log('CLIENT_ID:', CLIENT_ID);
-});
