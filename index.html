@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Football Depth Chart</title>
   <script>
+    var gapiInitialized = false;
+    var gisInitialized = false;
+
     function gapiLoaded() {
       console.log('GAPI library loaded');
       gapi.load('client', initializeGapiClient);
