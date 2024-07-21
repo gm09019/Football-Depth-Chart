@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Football Depth Chart</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="app.js" defer></script>
@@ -34,5 +35,12 @@
         <button id="plus">+1</button>
         <button id="record-play">Record Play</button>
     </div>
+    <div id="g_id_onload"
+         data-client_id="YOUR_ACTUAL_CLIENT_ID"
+         data-auto_select="true"
+         data-login_uri="https://YOUR_GITHUB_USERNAME.github.io/Football-Depth-Chart"
+         data-callback="handleCredentialResponse">
+    </div>
+    <div class="g_id_signin" data-type="standard"></div>
 </body>
 </html>

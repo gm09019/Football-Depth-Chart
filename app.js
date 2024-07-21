@@ -16,19 +16,18 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('SHEET_ID:', SHEET_ID);
   console.log('CLIENT_ID:', CLIENT_ID);
 
-  gapi.load('client:auth2', initClient);
+  function handleCredentialResponse(response) {
+    console.log('Encoded JWT ID token: ' + response.credential);
+    gapi.load('client', initClient);
+  }
 
   function initClient() {
     gapi.client.init({
       apiKey: API_KEY,
-      clientId: CLIENT_ID,
       discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
-      scope: "https://www.googleapis.com/auth/spreadsheets"
     }).then(function () {
       console.log('GAPI client initialized');
-      gapi.auth2.getAuthInstance().signIn().then(loadSheetsData, function(error) {
-        console.error('Error signing in:', error);
-      });
+      loadSheetsData();
     }, function(error) {
       console.error('Error initializing GAPI client:', error);
     });
