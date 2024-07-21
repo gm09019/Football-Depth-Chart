@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('Testing change detection');
+
+  // Existing code follows...
+});
+document.addEventListener('DOMContentLoaded', function() {
   const startersList = document.getElementById('starters');
   const backupsList = document.getElementById('backups');
   const bestPlaysList = document.getElementById('best-plays');
