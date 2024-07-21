@@ -46,24 +46,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const positions = ['Center', 'Quarter Back', 'Full Back', 'Left Guard', 'Right Guard', 'Left Tackle', 'Right Tackle', 'Left Tight End', 'Right Tight End', 'Left Wing Back', 'Right Wing Back'];
 
-    const starters = [];
-    const backups = [...players];
-
-    positions.forEach(position => {
-      const playerIndex = players.findIndex(p => p[1] === position);
-      if (playerIndex !== -1) {
-        const player = players[playerIndex];
-        starters.push(player);
-        backups.splice(backups.indexOf(player), 1); // Remove starter from backups
-      } else {
-        starters.push([`No starter for ${position}`]);
-      }
+    const starters = positions.map(position => {
+      const player = players.find(p => p[1] === position);
+      return player ? [player[0], player[1]] : [`No starter for ${position}`, position];
     });
+
+    const backupPositions = new Set(starters.map(starter => starter[1]));
+    const backups = players.filter(player => !backupPositions.has(player[1]));
 
     console.log('Starters:', starters);
     console.log('Backups:', backups);
 
-    startersList.innerHTML = starters.map(player => player.length > 1 ? `<li>${player[0]} - ${player[1]}</li>` : `<li>${player[0]}</li>`).join('');
+    startersList.innerHTML = starters.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
     backupsList.innerHTML = backups.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
   }
 
