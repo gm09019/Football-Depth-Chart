@@ -1,9 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM fully loaded and parsed');
 
+  const API_KEY = 'AIzaSyBQT0HSLG0Duc7iRvcDtv5PFAGXknTk-aY';
+  const SHEET_ID = '1e0EMRqmzGXB9etrRNMW7luqSsxehVeliGaTR8i8ASFw';
+
   console.log('API_KEY:', API_KEY);
   console.log('SHEET_ID:', SHEET_ID);
-  console.log('CLIENT_ID:', CLIENT_ID);
 
   document.getElementById('record-play').addEventListener('click', function() {
     const playType = document.getElementById('play-type').value;
@@ -46,16 +48,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  gapi.load('client:auth2', function() {
+  gapi.load('client', function() {
     console.log('GAPI library loaded');
     gapi.client.init({
       apiKey: API_KEY,
-      clientId: CLIENT_ID,
       discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
-      scope: "https://www.googleapis.com/auth/spreadsheets"
     }).then(function() {
       console.log('GAPI client initialized');
-      gapi.auth2.getAuthInstance().signIn().then(loadSheetsData);
+      loadSheetsData();
     }).catch(function(error) {
       console.error('Error initializing GAPI client:', error);
     });
