@@ -1,13 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM fully loaded and parsed');
 
-  const startersList = document.getElementById('starters');
-  const backupsList = document.getElementById('backups');
-  const bestPlaysList = document.getElementById('best-plays');
-  const yardageInput = document.getElementById('yardage');
-  const minusButton = document.getElementById('minus');
-  const plusButton = document.getElementById('plus');
-
   const API_KEY = 'AIzaSyBQT0HSLG0Duc7iRvcDtv5PFAGXknTk-aY'; // Replace with your actual API key
   const SHEET_ID = '1e0EMRqmzGXB9etrRNMW7luqSsxehVeliGaTR8i8ASFw';
   const CLIENT_ID = '897172538215-q7h3a6je890n0ctgd4ca6cg1uv6eha9g.apps.googleusercontent.com'; // Replace with your actual client ID
@@ -35,182 +28,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function loadSheetsData() {
     console.log('Loading sheets data...');
-    gapi.client.sheets.spreadsheets.values.batchGet({
+    gapi.client.sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
-      ranges: ['Depth Chart!A2:Z', 'Plays!A2:Z']
+      range: 'Depth Chart!A2:Z'
     }).then(function(response) {
       console.log('Sheets data loaded:', response);
-      const players = response.result.valueRanges[0].values;
-      const plays = response.result.valueRanges[1].values;
+      const players = response.result.values;
       console.log('Players:', players);
-      console.log('Plays:', plays);
-      renderDepthChart(players);
-      renderPlays(plays);
     }, function(error) {
       console.error('Error loading sheets data:', error);
     });
   }
 
-  function renderDepthChart(players) {
-    console.log('Rendering depth chart');
-    const positions = ['Center', 'Quarter Back', 'Full Back', 'Left Guard', 'Right Guard', 'Left Tackle', 'Right Tackle', 'Left Tight End', 'Right Tight End', 'Left Wing Back', 'Right Wing Back'];
-
-    const starters = positions.map(position => {
-      const player = players.find(player => player.includes(position));
-      console.log('Found starter for position', position, player);
-      return player;
+  window.onload = function() {
+    google.accounts.id.initialize({
+      client_id: CLIENT_ID,
+      callback: handleCredentialResponse
     });
-    const backups = players.filter(player => !starters.includes(player));
-
-    console.log('Starters:', starters);
-    console.log('Backups:', backups);
-
-    startersList.innerHTML = starters.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
-    backupsList.innerHTML = backups.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
-
-    new Sortable(startersList, {
-      group: 'players',
-      animation: 150,
-      onEnd: handlePlayerMove
-    });
-
-    new Sortable(backupsList, {
-      group: 'players',
-      animation: 150,
-      onEnd: handlePlayerMove
-    });
-  }
-
-  function renderPlays(plays) {
-    console.log('Rendering plays');
-    const playsList = document.getElementById('plays');
-    playsList.innerHTML = plays.map(play => `<li>${play[2]} (${play[4]}) - ${play[3]} yards</li>`).join('');
-  }
-
-  function handlePlayerMove(evt) {
-    const movedFrom = evt.from.id;
-    const movedTo = evt.to.id;
-
-    if (movedFrom === movedTo) {
-      return; // No change in list
-    }
-
-    if ((movedFrom === 'starters' && movedTo === 'backups') || (movedFrom === 'backups' && movedTo === 'starters')) {
-      swapPlayers();
-    } else {
-      saveDepthChart();
-    }
-  }
-
-  function swapPlayers() {
-    const starters = [...document.getElementById('starters').children].map(li => li.textContent.split(' - ')[0]);
-    const backups = [...document.getElementById('backups').children].map(li => li.textContent.split(' - ')[0]);
-
-    console.log('Swapping players');
-    console.log('Starters:', starters);
-    console.log('Backups:', backups);
-
-    gapi.client.sheets.spreadsheets.values.update({
-      spreadsheetId: SHEET_ID,
-      range: 'Depth Chart!A2',
-      valueInputOption: 'RAW',
-      resource: {
-        values: [starters.concat(backups)],
-        majorDimension: 'COLUMNS'
-      }
-    }).then(function(response) {
-      console.log('Depth chart updated:', response);
-    }, function(error) {
-      console.error('Error updating depth chart:', error);
-    });
-  }
-
-  function saveDepthChart() {
-    const starters = [...document.getElementById('starters').children].map(li => li.textContent.split(' - ')[0]);
-    const backups = [...document.getElementById('backups').children].map(li => li.textContent.split(' - ')[0]);
-
-    console.log('Saving depth chart');
-    console.log('Starters:', starters);
-    console.log('Backups:', backups);
-
-    gapi.client.sheets.spreadsheets.values.update({
-      spreadsheetId: SHEET_ID,
-      range: 'Depth Chart!A2',
-      valueInputOption: 'RAW',
-      resource: {
-        values: [starters.concat(backups)],
-        majorDimension: 'COLUMNS'
-      }
-    }).then(function(response) {
-      console.log('Depth chart saved:', response);
-    }, function(error) {
-      console.error('Error saving depth chart:', error);
-    });
-  }
-
-  document.getElementById('record-play').addEventListener('click', function() {
-    const playType = document.getElementById('play-type').value;
-    const play = document.getElementById('play').value;
-    const yardage = document.getElementById('yardage').value;
-    const lineup = [...document.getElementById('starters').children].map(li => li.textContent).join(', ');
-
-    console.log('Recording play');
-    console.log('Play Type:', playType);
-    console.log('Play:', play);
-    console.log('Yardage:', yardage);
-    console.log('Lineup:', lineup);
-
-    gapi.client.sheets.spreadsheets.values.append({
-      spreadsheetId: SHEET_ID,
-      range: 'Play Data!A2',
-      valueInputOption: 'RAW',
-      resource: {
-        values: [[new Date(), lineup, play, yardage, playType]],
-        majorDimension: 'ROWS'
-      }
-    }).then(function(response) {
-      console.log('Play recorded:', response);
-      updateBestPlays();
-    }, function(error) {
-      console.error('Error recording play:', error);
-    });
-  });
-
-  function updateBestPlays() {
-    console.log('Updating best plays');
-    gapi.client.sheets.spreadsheets.values.get({
-      spreadsheetId: SHEET_ID,
-      range: 'Play Data!A2:E'
-    }).then(function(response) {
-      const plays = response.result.values;
-      const playStats = {};
-
-      plays.forEach(play => {
-        const [ , lineup, playName, yardage, playType] = play;
-        if (!playStats[playName]) {
-          playStats[playName] = { totalYardage: 0, count: 0, type: playType };
-        }
-        playStats[playName].totalYardage += parseInt(yardage);
-        playStats[playName].count += 1;
-      });
-
-      const sortedPlays = Object.entries(playStats).map(([playName, stats]) => ({
-        playName,
-        averageYardage: stats.totalYardage / stats.count,
-        type: stats.type
-      })).sort((a, b) => b.type === 'Offense' ? b.averageYardage - a.averageYardage : a.averageYardage - b.averageYardage);
-
-      bestPlaysList.innerHTML = sortedPlays.map(play => `<li>${play.playName} (${play.type}) - ${play.averageYardage.toFixed(2)} yards</li>`).join('');
-    }, function(error) {
-      console.error('Error updating best plays:', error);
-    });
-  }
-
-  minusButton.addEventListener('click', () => {
-    yardageInput.value = (parseInt(yardageInput.value) || 0) - 1;
-  });
-
-  plusButton.addEventListener('click', () => {
-    yardageInput.value = (parseInt(yardageInput.value) || 0) + 1;
-  });
+    google.accounts.id.renderButton(
+      document.getElementById('g_id_signin'),
+      { theme: 'outline', size: 'large' }
+    );
+    google.accounts.id.prompt(); // Also display the One Tap dialog
+  };
 });
