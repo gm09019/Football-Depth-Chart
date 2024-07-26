@@ -1,0 +1,13 @@
+{
+  "name": "football-depth-chart",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "googleapis": "^89.0.0"
+  }
+}
