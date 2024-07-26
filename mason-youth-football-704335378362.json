@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "mason-youth-football",
+  "private_key_id": "7043353783629dfbc2478908e80ca247f9a63046",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCz2avlXw7eLK6U\nyINuxVUOZw50xlZLjXskb6jXVyH5otUGTcgWvsrWKszIvarkqrfF3UHIVo2cGBL/\nEpV/25jwxrHLqVrAxyUhTLXT9wekOqYabyeXBbGNy+D/PpwYRnkj6zENkA+0TcYF\nNjii69RucF+uY9+BmZlFMDBEtjPS7CkDxi03bdD61PvulNEPDwpjUiq54SS9rSf3\nJOYnoaeueLweYlOnEe+mxe/3SYV7YB28/gBSF5SioS/aLle9YM8d9hhcSKMQ66hN\nMTfN5ko82Wk5UKm4nZllTeqEjVv+8GnLlApVNNBysj9jIEHeoVohyqAX7dD0ZfqP\nVevdOJ33AgMBAAECggEAKss+daN6vC7Rk6FqdK8LoBOxguO2oN+XT4IqIKMg+G9g\nVNGpLJBVX0Rr2dAXm7VraO9Oucauh1fLHVpkrDmqWJBOufEgIQLBuPyxvy/mZ5N0\n9pFAUFUQfHbooJNbPQN3y64oy9tdgT+IQLE4JLwMngKrIamuAv5zU901fwQDrMoS\nkMhKlok31HoXpk7xJdeIX+PKGM07X3+cleBG/1gnbuapn6NXILsLpKH3xWFFrvnO\n+DQSQCObWjuc9NIo5cFYDmb6xUQUpV4LezEOz65GIJzk7HpAHJ3wRLN/96NbH0ce\nPnmqRKrX6eZSYp7C599UYhsRK9oJQhHdYiDt9OfBAQKBgQDZiliNolp+AUcqqGIB\n0kZXwioEnAPnliD3bO006cC3cQlwvKhC+B4mwqeHQ662q8nhQiwmwGBknJBO2c4U\nuSGfHFWMDLKRG44yRH9GLOAt4tHAySruSy+UMVnVjq96PIbaISSvVshBvEC888Yb\nUj1NdxeQiMO+uW714TGRTAWVtwKBgQDTpYJRjqS0CNsBkK/pp75A1t6BHtPQGoeP\nCscoqXye1E0sFjpEGVQtPAT9UKlNeiFqtWjoX51Sy+931G1NGQa3tbuVVgHtr9iS\nSHK9cexfakxipSdUz0WOLBwxaHcq1elKOvfMOtoDfOp2TdfxLyQNsaLiyuadHN8P\nHwzPnrs5wQKBgQDH55n4jXka0ZHUYWeuxMxfWM3D7pqn9g3VUQOp3CR8biN+td7p\nq5gJhlbstgWXV8XseiKYebAaxMTXsM7vvDBpRmBWklSFhAznpIpQsmxPvl+CCVqq\nH+1ZAQDMfpJCgdxqForflZ/wyE21VU53TNuIlCfTadp3KXAOAyLJolJ/gQKBgGs1\nAk8nrzxW5ADl9oWn55JWhPzozagzWAlYD0wEllCp/7FeTQNjxSToqypZqnjJbZXs\n8IgMrtda4CFV5EvSanmyP6PEnlN06IIo2p4lz/MBGFI7kDHAkF4U7+8DGKIFGxfz\nyMOV6AsuQmHMyp6sH1okafrxhmF9V2wEcWvV3sbBAoGBALSyAfRv36ZZJqVYLqdY\nibeRVRvsfy1gQEXcmqU0B8TnyO8oNXBZteKD4uHyEm9Ya3GwoGdqlTJNghOH/LuA\nhan+FvzflJ1wL5qgC64sycWlezFeMn3uYsTOi0Cl+3MXGHbSE3ZiD8qLNxh1mDa5\nbj1X/kn/NZFs8jrFJefjtaNN\n-----END PRIVATE KEY-----\n",
+  "client_email": "mason-youth-football@mason-youth-football.iam.gserviceaccount.com",
+  "client_id": "113333191756149780541",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/mason-youth-football%40mason-youth-football.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
