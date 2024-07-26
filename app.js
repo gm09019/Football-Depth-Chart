@@ -1,49 +1,111 @@
-const express = require('express');
-const { google } = require('googleapis');
-const path = require('path');
-const fs = require('fs');
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-const SHEET_ID = '1e0EMRqmzGXB9etrRNMW7luqSsxehVeliGaTR8i8ASFw';
-
-// Serve static files (HTML, CSS, etc.)
-app.use(express.static(path.join(__dirname)));
-
-// Load service account credentials
-const CREDENTIALS = JSON.parse(fs.readFileSync('mason-youth-football-704335378362.json'));
-
-// Authenticate with Google Sheets API
-async function authenticate() {
-  const auth = new google.auth.GoogleAuth({
-    credentials: CREDENTIALS,
-    scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded and parsed');
+  
+    const API_KEY = 'AIzaSyBQT0HSLG0Duc7iRvcDtv5PFAGXknTk-aY'; // Replace with your API Key if different
+    const SHEET_ID = '1e0EMRqmzGXB9etrRNMW7luqSsxehVeliGaTR8i8ASFw';
+  
+    console.log('API_KEY:', API_KEY);
+    console.log('SHEET_ID:', SHEET_ID);
+  
+    loadSheetsData();
+  
+    async function loadSheetsData() {
+      try {
+        const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values:batchGet?ranges=Depth%20Chart!A2:Z1000&ranges=Play%20Data!A2:E1000&key=${API_KEY}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Sheets data loaded:', data);
+        const players = data.valueRanges[0].values || [];
+        const plays = data.valueRanges[1].values || [];
+        console.log('Players:', players);
+        console.log('Plays:', plays);
+        renderDepthChart(players);
+        updateBestPlays(plays);
+      } catch (error) {
+        console.error('Error loading sheets data:', error);
+      }
+    }
+  
+    function renderDepthChart(players) {
+      console.log('Rendering depth chart');
+      const startersList = document.getElementById('starters');
+      const backupsList = document.getElementById('backups');
+  
+      const positions = ['Center', 'Quarter Back', 'Full Back', 'Left Guard', 'Right Guard', 'Left Tackle', 'Right Tackle', 'Left Tight End', 'Right Tight End', 'Left Wing Back', 'Right Wing Back'];
+  
+      const starters = [];
+      const backups = [...players];
+  
+      positions.forEach(position => {
+        const playerIndex = players.findIndex(p => p[1] === position);
+        if (playerIndex !== -1) {
+          const player = players[playerIndex];
+          starters.push([player[0], player[1]]);
+          backups.splice(playerIndex, 1); // Remove starter from backups
+        } else {
+          starters.push([`No starter for ${position}`, position]);
+        }
+      });
+  
+      console.log('Starters:', starters);
+      console.log('Backups:', backups);
+  
+      startersList.innerHTML = starters.map(player => player[0].includes('No starter') ? `<li>${player[0]}</li>` : `<li>${player[0]} - ${player[1]}</li>`).join('');
+      backupsList.innerHTML = backups.map(player => `<li>${player[0]} - ${player[1]}</li>`).join('');
+    }
+  
+    function updateBestPlays(plays) {
+      console.log('Updating best plays');
+      const playStats = {};
+  
+      plays.forEach(play => {
+        const [ , lineup, playName, yardage, playType] = play;
+        if (!playStats[playName]) {
+          playStats[playName] = { totalYardage: 0, count: 0, type: playType };
+        }
+        playStats[playName].totalYardage += parseInt(yardage);
+        playStats[playName].count += 1;
+      });
+  
+      const sortedPlays = Object.entries(playStats).map(([playName, stats]) => ({
+        playName,
+        averageYardage: stats.totalYardage / stats.count,
+        type: stats.type
+      })).sort((a, b) => b.type === 'Offense' ? b.averageYardage - a.averageYardage : a.averageYardage - b.averageYardage);
+  
+      const bestPlaysList = document.getElementById('best-plays');
+      bestPlaysList.innerHTML = sortedPlays.map(play => `<li>${play.playName} (${play.type}) - ${play.averageYardage.toFixed(2)} yards</li>`).join('');
+    }
+  
+    document.getElementById('record-play').addEventListener('click', function() {
+      const playType = document.getElementById('play-type').value;
+      const play = document.getElementById('play').value.trim();
+      const yardage = document.getElementById('yardage').value;
+      const lineup = [...document.getElementById('starters').children].map(li => li.textContent).join(', ');
+  
+      console.log('Recording play');
+      console.log('Play Type:', playType);
+      console.log('Play:', play);
+      console.log('Yardage:', yardage);
+      console.log('Lineup:', lineup);
+  
+      if (!playType || !play || !yardage || !lineup) {
+        console.error('Missing required fields:', { playType, play, yardage, lineup });
+        alert('Please fill in all fields before recording the play.');
+        return;
+      }
+  
+      const playData = [
+        [new Date().toISOString(), lineup, play, yardage, playType]
+      ];
+  
+      console.log('Play Data to Append:', playData);
+  
+      // Simulate play data appending without actual Google Sheets API call
+      console.log('Play recorded:', playData);
+      loadSheetsData(); // Refresh the data
+    });
   });
-  return auth.getClient();
-}
-
-// Fetch data from Google Sheets
-async function fetchSheetData(authClient) {
-  const sheets = google.sheets({ version: 'v4', auth: authClient });
-  const response = await sheets.spreadsheets.values.batchGet({
-    spreadsheetId: SHEET_ID,
-    ranges: ['Depth Chart!A2:Z1000', 'Play Data!A2:E1000'],
-  });
-  return response.data.valueRanges;
-}
-
-// Endpoint to get data from Google Sheets
-app.get('/api/sheet-data', async (req, res) => {
-  try {
-    const authClient = await authenticate();
-    const data = await fetchSheetData(authClient);
-    res.json(data);
-  } catch (error) {
-    res.status(500).send('Error fetching sheet data');
-  }
-});
-
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+  
